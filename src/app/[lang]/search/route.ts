@@ -1,3 +1,4 @@
+// app/api/search/route.ts
 import { source } from "@/lib/source";
 import { createFromSource } from "fumadocs-core/search/server";
 
@@ -9,4 +10,4 @@ export const { GET } = createFromSource(source, {
       "custom-locale": "english",
     },
   },
-});
+} as any);
