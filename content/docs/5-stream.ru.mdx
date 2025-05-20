@@ -1,0 +1,206 @@
+---
+title: Потоковый TTS Endpoint
+description: Подробности о потоковом endpoint'е DVoice TTS.
+---
+
+# Потоковый TTS Endpoint
+
+Потоковый Endpoint передает аудио в реальном времени через WebSocket, подходит для приложений с низкой задержкой.
+
+## Endpoint
+
+**WebSocket** `ws://oyqiz.airi.uz/stream`
+
+## Аутентификация
+
+Включите API-токен в заголовок `token` ([Аутентификация](./2-authentication)):
+
+```
+GET ws://oyqiz.airi.uz/stream
+token: <your-token>
+```
+
+## Начальное сообщение
+
+Отправьте JSON-сообщение для инициирования потоковой передачи:
+
+| Поле   | Тип    | Описание                             | Обязателен |
+| ------ | ------ | ------------------------------------ | ---------- |
+| text   | string | Текст для преобразования в речь      | Да         |
+| model  | string | Модель голоса (например, "Iroda")    | Да         |
+| format | string | Аудиоформат (например, "mp3", "wav") | Да         |
+
+**Пример начального сообщения**:
+
+```json
+{
+  "text": "Haq olinur, berilmas",
+  "model": "Iroda",
+  "format": "mp3"
+}
+```
+
+## Ответ
+
+- **Сообщения**: Бинарные аудиофрагменты (Buffer).
+- **Соединение**: Закрывается после завершения потоковой передачи или при ошибке.
+
+## Примеры SDK
+
+Ниже приведены примеры использования потокового TTS Endpoint с помощью websocat, Node.js и Python.
+
+<Tabs items={['websocat', 'Node.js', 'Python']} defaultValue="websocat">
+  <Tab value="websocat">
+    ```bash
+    # Установите websocat, если он еще не установлен
+    # На Ubuntu: sudo apt install websocat
+    # На macOS: brew install websocat
+    # На Windows: Скачайте с https://github.com/vi/websocat#install или используйте менеджер пакетов, например Chocolatey
+    # Замените <your-token> на ваш действительный API-токен
+    # Примечание: Начальное сообщение не отправляется; параметры указаны в URL
+    websocat "ws://oyqiz.airi.uz/stream?text=Haq+olinur,+berilmas&model=Iroda&format=mp3" \
+      -H "token: <your-token>" --binary > output.mp3
+    ```
+
+    **Примечания**:
+    - Параметры (`text`, `model`, `format`) передаются как параметры запроса URL.
+    - Используйте `+` или `%20` для пробелов в параметре `text` (например, "Haq olinur, berilmas" становится "Haq+olinur,+berilmas").
+    - Флаг `--binary` обеспечивает корректную обработку бинарных данных (аудиофрагментов).
+    - Выходные данные сохраняются в `output.mp3`. Убедитесь, что ваша система поддерживает воспроизведение MP3 или конверсию.
+
+  </Tab>
+  <Tab value="Node.js">
+    ```javascript
+    const WebSocket = require('ws');
+    const fs = require('fs');
+
+    // Замените '<your-token>' на ваш действительный API-токен
+    const params = new URLSearchParams({
+        text: 'Haq olinur, berilmas',
+        model: 'Iroda',
+        format: 'mp3'
+    });
+    const ws = new WebSocket(`ws://oyqiz.airi.uz/stream?${params.toString()}`, {
+        headers: {
+            'token': '<your-token>'
+        }
+    });
+
+    ws.on('open', () => {
+        console.log('Установлено WebSocket-соединение');
+        // Начальное сообщение не требуется; параметры указаны в URL
+    });
+
+    const outputStream = fs.createWriteStream('output.mp3');
+    ws.on('message', (data, isBinary) => {
+        let buffer;
+        if (isBinary) {
+            // Обработка бинарных данных (например, Buffer, ArrayBuffer или массив Buffer)
+            if (data instanceof Buffer) {
+                buffer = data;
+            } else if (data instanceof ArrayBuffer) {
+                buffer = Buffer.from(new Uint8Array(data));
+            } else if (Array.isArray(data)) {
+                buffer = Buffer.concat(data);
+            } else {
+                console.warn('Неподдерживаемый формат бинарного сообщения');
+                return;
+            }
+            console.log('Получен аудиофрагмент:', buffer.length, 'байтов');
+            outputStream.write(buffer);
+        } else {
+            // Обработка текстовых метаданных
+            console.log('Получены метаданные:', data.toString());
+        }
+    });
+
+    ws.on('close', () => {
+        console.log('Потоковая передача завершена');
+        outputStream.end();
+    });
+
+    ws.on('error', (error) => {
+        console.error('Ошибка:', error.message);
+        outputStream.end();
+    });
+    ```
+    **Примечания**:
+    - Установите библиотеку `ws`: `npm install ws`.
+    - Параметры (`text`, `model`, `format`) передаются как параметры запроса URL.
+    - Аудиофрагменты сохраняются в `output.mp3`.
+    - Убедитесь, что ваш токен действителен, чтобы избежать ошибок аутентификации.
+
+  </Tab>
+  <Tab value="Python">
+    ```python
+    import websocket
+    import urllib.parse
+
+    # Замените '<your-token>' на ваш действительный API-токен
+    params = {
+        "text": "Haq olinur, berilmas",
+        "model": "Iroda",
+        "format": "mp3"
+        # "indexes": true  # Опционально: раскомментируйте, если нужно (не поддерживается этим API)
+    }
+    query_string = urllib.parse.urlencode(params)
+    ws_url = f"ws://oyqiz.airi.uz/stream?{query_string}"
+    headers = {
+        "token": "<your-token>"
+    }
+
+    def on_open(ws):
+        print("Установлено WebSocket-соединение")
+        # Начальное сообщение не требуется; параметры указаны в URL
+
+    def on_message(ws, message):
+        if isinstance(message, bytes):
+            print(f"Получен аудиофрагмент: {len(message)} байтов")
+            with open("output.mp3", "ab") as f:
+                f.write(message)
+        else:
+            print(f"Получены метаданные: {message}")
+
+    def on_error(ws, error):
+        print("Ошибка:", error)
+
+    def on_close(ws, close_status_code, close_msg):
+        print("Потоковая передача завершена")
+
+    ws = websocket.WebSocketApp(
+        ws_url,
+        header=headers,
+        on_open=on_open,
+        on_message=on_message,
+        on_error=on_error,
+        on_close=on_close
+    )
+
+    ws.run_forever()
+    ```
+    **Примечания**:
+    - Установите библиотеку `websocket-client`: `pip install websocket-client`.
+    - Параметры (`text`, `model`, `format`) передаются как параметры запроса URL.
+    - Аудиофрагменты добавляются в `output.mp3` (используйте режим `"ab"` для бинарного добавления).
+    - Убедитесь, что ваш токен действителен, чтобы избежать ошибок аутентификации.
+
+  </Tab>
+</Tabs>
+
+## Примечания
+
+- Оплата основана на общей длине текста.
+- Убедитесь в стабильном WebSocket-соединении.
+- См. [Обработка ошибок](./6-errors) для возможных ошибок.
+
+<Callout type="warning">
+  Включите заголовок `token` в WebSocket-соединении, чтобы избежать ошибки `403
+  Forbidden`.
+</Callout>
+
+## Связанные разделы
+
+- [Аутентификация](./2-authentication)
+- [Использование SDK](./3-sdks)
+- [Одноразовый Endpoint](./4-single)
+- [Обработка ошибок](./6-errors)

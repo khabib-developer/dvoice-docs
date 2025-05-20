@@ -1,0 +1,204 @@
+---
+title: Использование SDK
+description: Как использовать SDK DVoice TTS для одноразовых и потоковых endpoint'ов.
+---
+
+# Использование SDK
+
+SDK DVoice TTS упрощает интеграцию с API TTS, предоставляя методы для генерации единственного аудиофайла и потоковой передачи в реальном времени. SDK доступен для Node.js и Python.
+
+## Установка
+
+### Node.js
+
+Установите SDK с помощью npm:
+
+```bash
+npm install dvoice-tts
+```
+
+### Python
+
+Установите SDK с помощью pip:
+
+```bash
+pip install dvoice-tts
+```
+
+## Инициализация
+
+SDK требует API-токен для аутентификации, полученный из [Аутентификации](./2-authentication).
+
+### Node.js
+
+```javascript
+const { TTS } = require("dvoice-tts");
+
+const client = new TTS({ token: "<your-token>" });
+```
+
+### Python
+
+```python
+from dvoice_tts import TTS
+
+client = TTS(token='<your-token>')
+```
+
+## Методы
+
+### Метод `single`
+
+Генерирует единый аудиофайл из текста через HTTP POST-запрос.
+
+#### Параметры
+
+| Поле   | Тип    | Описание                             | Обязателен |
+| ------ | ------ | ------------------------------------ | ---------- |
+| text   | string | Текст для преобразования в речь      | Да         |
+| model  | string | Модель голоса (например, "Iroda")    | Да         |
+| format | string | Аудиоформат (например, "mp3", "wav") | Да         |
+
+#### Возвращает
+
+- `Promise<Buffer>`: Аудиоданные в формате Buffer.
+
+#### Пример (Node.js)
+
+```javascript
+const { TTS } = require("dvoice-tts");
+
+const client = new TTS({ token: "<your-token>" });
+
+async function generateSingleAudio() {
+  try {
+    const audioBuffer = await client.single({
+      text: "Haq olinur, berilmas",
+      model: "Iroda",
+      format: "mp3",
+    });
+    require("fs").writeFileSync("output.mp3", audioBuffer);
+    console.log("Аудио сохранено в output.mp3");
+  } catch (error) {
+    console.error("Ошибка:", error.message);
+  }
+}
+
+generateSingleAudio();
+```
+
+#### Пример (Python)
+
+```python
+from dvoice_tts import TTS
+
+client = TTS(token='<your-token>')
+
+try:
+    audio_data = client.single(
+        text='Haq olinur, berilmas',
+        model='Iroda',
+        format='mp3'
+    )
+    with open('output.mp3', 'wb') as f:
+        f.write(audio_data)
+    print('Аудио сохранено в output.mp3')
+except Exception as e:
+    print('Ошибка:', str(e))
+```
+
+### Метод `stream`
+
+Передает аудио в реальном времени через WebSocket для приложений с низкой задержкой.
+
+#### Параметры
+
+| Поле   | Тип    | Описание                             | Обязателен |
+| ------ | ------ | ------------------------------------ | ---------- |
+| text   | string | Текст для преобразования в речь      | Да         |
+| model  | string | Модель голоса (например, "Iroda")    | Да         |
+| format | string | Аудиоформат (например, "mp3", "wav") | Да         |
+
+#### Callback
+
+- `err: Error | null`: Ошибка, если поток не работает.
+- `chunk: Buffer | null`: Аудио-фрагмент или null, если поток завершен.
+- `close: () => void`: Функция для закрытия WebSocket-соединения.
+
+#### Пример (Node.js)
+
+```javascript
+const { TTS } = require("dvoice-tts");
+const fs = require("fs");
+
+const client = new TTS({ token: "<your-token>" });
+
+client.stream(
+  {
+    text: "Haq olinur, berilmas",
+    model: "Iroda",
+    format: "mp3",
+  },
+  (err, chunk, close) => {
+    if (err) {
+      console.error("Ошибка:", err.message);
+      close();
+      return;
+    }
+    if (chunk) {
+      console.log("Получен аудио-фрагмент:", chunk.length, "байтов");
+      fs.appendFileSync("output.mp3", chunk);
+    } else {
+      console.log("Поток завершен");
+      close();
+    }
+  }
+);
+```
+
+#### Пример (Python)
+
+```python
+from dvoice_tts import TTS
+
+client = TTS(token='<your-token>')
+
+def handle_stream(err, chunk, close):
+    if err:
+        print('Ошибка:', err)
+        close()
+        return
+    if chunk:
+        print(f'Получен аудио-фрагмент: {len(chunk)} байтов')
+        with open('output.mp3', 'ab') as f:
+            f.write(chunk)
+    else:
+        print('Поток завершен')
+        close()
+
+client.stream(
+    text='Haq olinur, berilmas',
+    model='Iroda',
+    format='mp3',
+    callback=handle_stream
+)
+```
+
+## Примечания
+
+- Метод `single` требует HTTPS-агента для безопасных соединений (обрабатывается автоматически в SDK).
+- Метод `stream` использует WebSocket (`ws://oyqiz.airi.uz/stream`) с параметрами `text`, `model` и `format` в запросе.
+- Оплата основана на длине текста для обоих методов.
+- См. [Обработка ошибок](./6-errors) для возможных кодов ошибок.
+
+<Callout type="warning">
+  Убедитесь, что ваш API-токен действителен и надежно хранится, чтобы избежать
+  ошибок `403 Forbidden`.
+</Callout>
+
+## Связанные разделы
+
+- [Аутентификация](./2-authentication)
+- [Одноразовый Endpoint](./4-single)
+- [Потоковый Endpoint](./5-stream)
+- [Обработка ошибок](./6-errors)

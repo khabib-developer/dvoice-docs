@@ -1,0 +1,42 @@
+---
+title: DVoice TTS API Overview
+description: Introduction to the DVoice Text-to-Speech API.
+---
+
+# TTS API Overview
+
+The DVoice TTS (Text-to-Speech) API converts text into high-quality audio. It supports two endpoints:
+
+- **Single Endpoint**: Generate audio from text in a single HTTP POST request ([Details](./4-single)).
+- **Streaming Endpoint**: Stream audio in real-time via WebSocket for low-latency applications ([Details](./5-stream)).
+
+## Features
+
+- Supports multiple audio formats (e.g., MP3, WAV).
+- Configurable voice models (e.g., `Iroda`).
+- SDKs for [Node.js](https://www.npmjs.com/package/dvoice-tts) and [Python](https://pypi.org/project/dvoice-tts) ([SDK Usage](./3-sdks)).
+
+## Use Cases
+
+- Voiceovers for videos or podcasts.
+- Real-time narration for apps.
+- Accessibility tools for visually impaired users.
+
+## Getting Started
+
+1. Obtain an API token ([Authentication](./2-authentication)).
+2. Use our [SDKs](./3-sdks) for quick integration.
+3. Explore the [Single Endpoint](./4-single) or [Streaming Endpoint](./5-stream).
+
+<Callout type="info">
+  Visit [profile.dvoice.uz](https://profile.dvoice.uz) to generate your API
+  token.
+</Callout>
+
+## Navigation
+
+- [Authentication](./2-authentication)
+- [SDK Usage](./3-sdks)
+- [Single Endpoint](./4-single)
+- [Streaming Endpoint](./5-stream)
+- [Error Handling](./6-errors)

@@ -1,0 +1,66 @@
+---
+title: Autentifikatsiya
+description: DVoice TTS API bilan autentifikatsiya qilish usuli.
+---
+
+# Autentifikatsiya
+
+DVoice TTS API token asosidagi autentifikatsiyadan foydalanadi. Siz [Bir martalik Endpoint](./4-single) va [Oqim Endpoint](./5-stream) ga barcha so'rovlaringizda haqiqiy API tokenini kiritishingiz kerak.
+
+## Token olish
+
+1. [profile.dvoice.uz](https://profile.dvoice.uz) saytiga tashrif buyuring.
+2. DVoice hisobingiz ma'lumotlari bilan tizimga kiring.
+3. API bo'limiga o'tib, API tokeningizni yarating yoki nusxalang.
+4. Tokeningizni xavfsiz joyda saqlang.
+
+<Callout type="warning">
+  API tokeningizni ommaga oshkormang. Agar u xavf ostida qolsa,
+  [profile.dvoice.uz](https://profile.dvoice.uz) orqali yangi token yarating.
+</Callout>
+
+## So'rovni autentifikatsiya qilish
+
+### Bir martalik Endpoint (HTTP)
+
+`/tts` ga HTTP POST so'rovida `token` sarlavhasiga tokenni kiring.
+
+**Misol sarlavha**:
+
+```
+token: <your-token>
+```
+
+### Oqim Endpoint (WebSocket)
+
+`wss://oyqiz.airi.uz/stream` ga ulanishda `token` sarlavhasiga tokenni kiring.
+
+**Misol ulanish** (oddiy WebSocket):
+
+```
+GET wss://oyqiz.airi.uz/tts/stream
+token: <your-token>
+```
+
+SDK’lardan foydalanayotganda, tokenni mijozni boshlash paytida sozlang ([SDK’dan foydalanish](./3-sdks)).
+
+## Autentifikatsiya xatolari
+
+| Holat/Kod | Xabar                              | Tavsif                               |
+| --------- | ---------------------------------- | ------------------------------------ |
+| 401       | Noto'g'ri token                    | Token yaroqsiz yoki muddati tugagan. |
+| 403       | Autentifikatsiya uchun token kerak | Token kiritilmagan.                  |
+
+WebSocket ulanishlarida noto'g'ri yoki mavjud bo'lmagan token `401 Unauthorized` yoki `403 Forbidden` javobi bilan natija beradi va ulanish yopiladi ([Xatolarni boshqarish](./6-errors)).
+
+## Eslatmalar
+
+- Tokenlar foydalanuvchi identifikatorini va token nomini o'z ichiga oladi, server tomonida tekshiriladi.
+- Agar `401 Invalid Token` xatosi duch kelsa, tokeningizni [profile.dvoice.uz](https://profile.dvoice.uz) da tekshiring.
+- Ko'proq xato tafsilotlari uchun [Xatolarni boshqarish](./6-errors) ga qarang.
+
+<Callout type="info">
+  Token yaratish muammolari bo'lsa,
+  [profile.dvoice.uz](https://profile.dvoice.uz) orqali yordamga murojaat
+  qiling.
+</Callout>

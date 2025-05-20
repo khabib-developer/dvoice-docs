@@ -1,0 +1,204 @@
+---
+title: SDK’dan foydalanish
+description: DVoice TTS SDK’dan yagona va oqim endpoint’lari uchun foydalanish usuli.
+---
+
+# SDK’dan foydalanish
+
+DVoice TTS SDK TTS API bilan integratsiyani soddalashtiradi, yagona audio yaratish va real vaqt rejimida oqimni ta'minlash uchun usullarni taqdim etadi. SDK Node.js va Python uchun mavjud.
+
+## O'rnatish
+
+### Node.js
+
+SDK’ni npm yordamida o'rnating:
+
+```bash
+npm install dvoice-tts
+```
+
+### Python
+
+SDK’ni pip yordamida o'rnating:
+
+```bash
+pip install dvoice-tts
+```
+
+## Ishga tushirish
+
+SDK autentifikatsiya uchun API tokenini talab qiladi, bu [Autentifikatsiya](./2-authentication) dan olinadi.
+
+### Node.js
+
+```javascript
+const { TTS } = require("dvoice-tts");
+
+const client = new TTS({ token: "<your-token>" });
+```
+
+### Python
+
+```python
+from dvoice_tts import TTS
+
+client = TTS(token='<your-token>')
+```
+
+## Usullar
+
+### `single` usuli
+
+Matnni HTTP POST so'rovi orqali yagona audio fayliga aylantiradi.
+
+#### Parametrlar
+
+| Maydon | Tur    | Tavsif                               | Majburiy |
+| ------ | ------ | ------------------------------------ | -------- |
+| text   | string | Nutqqa aylantirish uchun matn        | Ha       |
+| model  | string | Ovoz modeli (masalan, "Iroda")       | Ha       |
+| format | string | Audio format (masalan, "mp3", "wav") | Ha       |
+
+#### Qaytaradi
+
+- `Promise<Buffer>`: Audio ma'lumotlari Buffer sifatida.
+
+#### Misol (Node.js)
+
+```javascript
+const { TTS } = require("dvoice-tts");
+
+const client = new TTS({ token: "<your-token>" });
+
+async function generateSingleAudio() {
+  try {
+    const audioBuffer = await client.single({
+      text: "Haq olinur, berilmas",
+      model: "Iroda",
+      format: "mp3",
+    });
+    require("fs").writeFileSync("output.mp3", audioBuffer);
+    console.log("Audio output.mp3 ga saqlandi");
+  } catch (error) {
+    console.error("Xatolik:", error.message);
+  }
+}
+
+generateSingleAudio();
+```
+
+#### Misol (Python)
+
+```python
+from dvoice_tts import TTS
+
+client = TTS(token='<your-token>')
+
+try:
+    audio_data = client.single(
+        text='Haq olinur, berilmas',
+        model='Iroda',
+        format='mp3'
+    )
+    with open('output.mp3', 'wb') as f:
+        f.write(audio_data)
+    print('Audio output.mp3 ga saqlandi')
+except Exception as e:
+    print('Xatolik:', str(e))
+```
+
+### `stream` usuli
+
+Real vaqt rejimida audio oqimini WebSocket orqali ta'minlaydi, past kechikishli ilovalar uchun.
+
+#### Parametrlar
+
+| Maydon | Tur    | Tavsif                               | Majburiy |
+| ------ | ------ | ------------------------------------ | -------- |
+| text   | string | Nutqqa aylantirish uchun matn        | Ha       |
+| model  | string | Ovoz modeli (masalan, "Iroda")       | Ha       |
+| format | string | Audio format (masalan, "mp3", "wav") | Ha       |
+
+#### Callback
+
+- `err: Error | null`: Agar oqim ishlamasa xatolik.
+- `chunk: Buffer | null`: Audio parchalari yoki oqim tugagan bo'lsa null.
+- `close: () => void`: WebSocket ulanishini yopish funksiyasi.
+
+#### Misol (Node.js)
+
+```javascript
+const { TTS } = require("dvoice-tts");
+const fs = require("fs");
+
+const client = new TTS({ token: "<your-token>" });
+
+client.stream(
+  {
+    text: "Haq olinur, berilmas",
+    model: "Iroda",
+    format: "mp3",
+  },
+  (err, chunk, close) => {
+    if (err) {
+      console.error("Xatolik:", err.message);
+      close();
+      return;
+    }
+    if (chunk) {
+      console.log("Audio parchasi olindi:", chunk.length, "bayt");
+      fs.appendFileSync("output.mp3", chunk);
+    } else {
+      console.log("Oqim yakunlandi");
+      close();
+    }
+  }
+);
+```
+
+#### Misol (Python)
+
+```python
+from dvoice_tts import TTS
+
+client = TTS(token='<your-token>')
+
+def handle_stream(err, chunk, close):
+    if err:
+        print('Xatolik:', err)
+        close()
+        return
+    if chunk:
+        print(f'Audio parchasi olindi: {len(chunk)} bayt')
+        with open('output.mp3', 'ab') as f:
+            f.write(chunk)
+    else:
+        print('Oqim yakunlandi')
+        close()
+
+client.stream(
+    text='Haq olinur, berilmas',
+    model='Iroda',
+    format='mp3',
+    callback=handle_stream
+)
+```
+
+## Eslatmalar
+
+- `single` usuli xavfsiz ulanishlar uchun HTTPS-agentni talab qiladi (SDK’da avtomatik ishlaydi).
+- `stream` usuli WebSocket (`ws://oyqiz.airi.uz/stream`) dan foydalanadi, `text`, `model` va `format` parametrlari so'rovda ishlatiladi.
+- To’lov ikkala usulda ham matn uzunligiga asoslanadi.
+- Mumkin bo’lgan xato kodlari uchun [Xatolarni boshqarish](./6-errors) ga qarang.
+
+<Callout type="warning">
+  API tokeningiz haqiqiy ekanligiga va xavfsiz tarzda saqlanganiга ishonch hosil
+  qiling, aks holda `403 Forbidden` xatolari yuzaga kelishi mumkin.
+</Callout>
+
+## Bog‘liq bo‘limlar
+
+- [Autentifikatsiya](./2-authentication)
+- [Bir martalik Endpoint](./4-single)
+- [Oqim Endpoint](./5-stream)
+- [Xatolarni boshqarish](./6-errors)
