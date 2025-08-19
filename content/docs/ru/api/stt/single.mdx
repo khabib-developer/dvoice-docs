@@ -9,7 +9,7 @@ import { Tabs, Tab } from "fumadocs-ui/components/tabs";
 
 ## Эндпоинт
 
-`POST https://oyqiz.airi.uz/stt`
+`POST https://oyqiz.airi.uz/api/v2/stt`
 
 ## Аутентификация
 
@@ -38,7 +38,7 @@ token: <your-token>
 - Эндпоинт ограничен 5 минутами аудио в минуту на один API-токен.
 
 ```bash
-curl -X POST "https://oyqiz.airi.uz/stt" \
+curl -X POST "https://oyqiz.airi.uz/api/v2/stt" \
   -H "Content-Type: multipart/form-data" \
   -H "token: YOUR_API_TOKEN" \
   -F "audio=@audio.mp3" \
@@ -63,7 +63,7 @@ async function stt() {
   formData.append("audio", fs.createReadStream("audio.mp3"));
   formData.append("language", "uz");
 
-  const response = await fetch("https://oyqiz.airi.uz/stt", {
+  const response = await fetch("https://oyqiz.airi.uz/api/v2/stt", {
     method: "POST",
     headers: {
       token: "YOUR_API_TOKEN",
@@ -91,7 +91,7 @@ stt();
 ```python
 import requests
 
-url = "https://oyqiz.airi.uz/stt"
+url = "https://oyqiz.airi.uz/api/v2/stt"
 headers = {
     "token": "YOUR_API_TOKEN"
 }

@@ -9,7 +9,7 @@ The **STT Endpoint** enables you to convert spoken audio into accurate text tran
 
 ## Endpoint
 
-`POST https://oyqiz.airi.uz/stt`
+`POST https://oyqiz.airi.uz/api/v2/stt`
 
 ## Authentication
 
@@ -62,7 +62,7 @@ async function stt() {
   formData.append("audio", fs.createReadStream("audio.mp3"));
   formData.append("language", "uz");
 
-  const response = await fetch("https://oyqiz.airi.uz/stt", {
+  const response = await fetch("https://oyqiz.airi.uz/api/v2/stt", {
     method: "POST",
     headers: {
       token: "YOUR_API_TOKEN",
@@ -91,7 +91,7 @@ stt();
 
 import requests
 
-url = "https://oyqiz.airi.uz/stt"
+url = "https://oyqiz.airi.uz/api/v2/stt"
 headers = {
     "token": "YOUR_API_TOKEN"
 }
