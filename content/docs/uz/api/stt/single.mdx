@@ -1,0 +1,144 @@
+---
+title: STT
+description: Transkript yaratish.
+---
+
+import { Tabs, Tab } from "fumadocs-ui/components/tabs";
+
+**STT Uchastkasi** sizga nutqni aniq matn transkriptlariga aylantirish uchun yagona HTTP POST so‘rovidan foydalanish imkonini beradi. Ushbu uchastka oson foydalanish uchun mo‘ljallangan bo‘lib, til avtomatik aniqlanishi kerak bo‘lganda foydalaniladi. 19-avgust, 2025 holatiga yangilangan.
+
+## Uchastka
+
+`POST https://oyqiz.airi.uz/stt`
+
+## Autentifikatsiya
+
+So‘rov sarlavhasida API tokeningizni kiritng:
+
+```
+token: <your-token>
+```
+
+## So‘rov Tanasi
+
+| Maydon   | Tur    | Majburiy | Tavsif                                                                                        |
+| -------- | ------ | -------- | --------------------------------------------------------------------------------------------- |
+| audio    | fayl   | ✅       | Transkript qilish uchun audio fayl (masalan, "audio.mp3").                                    |
+| language | string | ❌       | ISO 639-1 til kodi (masalan, "uz" o‘zbekcha uchun); agar ko‘rsatilmasa, avtomatik aniqlanadi. |
+
+## Foydalanish Misollari
+
+<Tabs items={['curl', 'javascript', 'python']} defaultValue="curl">
+  <Tab value="curl">
+
+**Eslatmalar**:
+
+- `audio` faylni yuklash uchun `-F` flagidan foydalaning (masalan, `audio.mp3`).
+- `YOUR_API_TOKEN` ni haqiqiy API tokeningiz bilan almashtiring.
+- Uchastka har bir API token uchun daqiqada 5 daqiqa audio bilan cheklangan.
+
+```bash
+curl -X POST "https://oyqiz.airi.uz/stt" \
+  -H "Content-Type: multipart/form-data" \
+  -H "token: YOUR_API_TOKEN" \
+  -F "audio=@audio.mp3" \
+  -F "language=uz"
+```
+
+  </Tab>
+  <Tab value="javascript">
+
+**Eslatmalar**:
+
+- Qo‘shimcha dasturlarni o‘rnating: `npm install node-fetch form-data`.
+- `YOUR_API_TOKEN` ni haqiqiy tokeningiz bilan almashtiring.
+- `audio.mp3` faylning yo‘lini to‘g‘ri ko‘rsating.
+
+```javascript
+import fetch from "node-fetch";
+import fs from "fs";
+
+async function stt() {
+  const formData = new FormData();
+  formData.append("audio", fs.createReadStream("audio.mp3"));
+  formData.append("language", "uz");
+
+  const response = await fetch("https://oyqiz.airi.uz/stt", {
+    method: "POST",
+    headers: {
+      token: "YOUR_API_TOKEN",
+    },
+    body: formData,
+  });
+
+  const data = await response.json();
+  console.log("Transkript:", data.transcript);
+}
+
+stt();
+```
+
+    </Tab>
+
+  <Tab value="python">
+
+**Eslatmalar**:
+
+- Kutubxonani o‘rnating: `pip install requests`.
+- `YOUR_API_TOKEN` ni haqiqiy tokeningiz bilan almashtiring.
+- `audio.mp3` faylning mavjudligi va o‘qilishini tekshiring.
+
+```python
+import requests
+
+url = "https://oyqiz.airi.uz/stt"
+headers = {
+    "token": "YOUR_API_TOKEN"
+}
+files = {
+    "audio": open("audio.mp3", "rb")
+}
+data = {
+    "language": "uz"
+}
+
+response = requests.post(url, headers=headers, files=files, data=data)
+print("Transkript:", response.json()["transcript"])
+```
+
+      </Tab>
+
+  </Tabs>
+
+## Javob
+
+- **transcript**: _string_  
+  Audio faylidagi transkript matni.
+- **inference_time**: _number_  
+  Audio qayta ishlanishi va transkript yaratish uchun ketgan vaqt (sekundlarda).
+
+### Misol Javob (200 OK)
+
+```json
+{
+  "transcript": "Haq olinur, berilmas.",
+  "inference_time": 2.1
+}
+```
+
+### Misol Xatolik Javobi (429 Too Many Requests)
+
+```json
+{
+  "error": "Chegara chegaradan oshdi. Daqiqada 5 daqiqa audio ruxsat etilgan.",
+  "status": 429
+}
+```
+
+## Eslatmalar
+
+- STT modeli aniq transkriptga optimallashtirilgan bo‘lib, agar `language` ko‘rsatilmagan bo‘lsa, til avtomatik aniqlanadi.
+- Qo‘llab-quvvatlanadigan audio formatlari: `MP3`, `WAV`, `AAC`, va `OGG` (tavsilotlar [API Havolasi](../../api/stt/single) da).
+- Ishlash sifati audio sifati va uzunligiga qarab o‘zgarishi mumkin.
+- Hisob-kitob audio qayta ishlanish muddatiga qarab, sekundlarda hisoblanadi.
+- Foydalanish tafsilotlari va qo‘llab-quvvatlash uchun [dashbordni](https://voice.airi.uz) tekshiring.

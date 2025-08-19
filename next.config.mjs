@@ -9,7 +9,7 @@ const config = {
     return [
       {
         source: "/",
-        destination: "/docs/1-index",
+        destination: "/docs/documentation/get-started/overview",
         permanent: false, // or true, depending on whether it's a permanent redirect
       },
     ];

@@ -1,0 +1,112 @@
+openapi: 3.1.1
+info:
+  title: DVoice API
+  version: "1.0.0"
+  description: |
+    DVoice provides powerful Text-to-Speech (TTS) capabilities for converting
+    Uzbek text into natural spoken audio. You can generate audio files with
+    a single request or stream audio in real-time over WebSocket.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.dvoice.uz
+    description: Production server
+  - url: http://localhost:3000
+    description: Local development server
+
+security:
+  - TokenAuth: []
+
+components:
+  securitySchemes:
+    TokenAuth:
+      type: apiKey
+      in: header
+      name: token
+
+  schemas:
+    TTSRequest:
+      type: object
+      required: [text, model, format]
+      properties:
+        text:
+          type: string
+          example: "Haq olinur, berilmas"
+        model:
+          type: string
+          description: Voice model to use
+          enum: [Iroda, Surayyo_v2]
+          example: "Iroda"
+        format:
+          type: string
+          description: Audio format
+          enum: [MP3, WAV, AAC, OGG, FLAC]
+          example: "WAV"
+        data:
+          type: object
+          description: Extra options depending on the model
+          properties:
+            emo:
+              type: string
+              enum: [Happy, Strict, Neural]
+              description: Optional emotion (only for Surayyo_v2)
+
+    TTSResponse:
+      type: object
+      properties:
+        audio_url:
+          type: string
+          example: "https://cdn.dvoice.uz/out.wav"
+
+paths:
+  /tts/single:
+    post:
+      summary: Single TTS
+      description: Convert text into a single audio file.
+      operationId: singleTTS
+      security:
+        - TokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TTSRequest"
+            example:
+              text: "Haq olinur, berilmas"
+              model: "Iroda"
+              format: "WAV"
+      responses:
+        "200":
+          description: Binary audio file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TTSResponse"
+        "400":
+          description: Invalid request payload
+        "401":
+          description: Unauthorized – missing or invalid token
+
+  /tts/stream:
+    get:
+      summary: Streaming TTS
+      description: |
+        Stream audio in real-time via WebSocket.
+
+        - Connect to `ws://oyqiz.airi.uz/stream`
+        - Provide your API token in the `token` header
+      operationId: streamTTS
+      security:
+        - TokenAuth: []
+      responses:
+        "101":
+          description: Switching Protocols (WebSocket upgrade)
+        "200":
+          description: Placeholder response required for validation
+        "400":
+          description: Invalid upgrade request
+        "401":
+          description: Unauthorized – missing or invalid token

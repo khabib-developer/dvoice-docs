@@ -1,0 +1,55 @@
+---
+title: Text to Speech
+description: Learn how to turn text into lifelike spoken audio with DVoice
+---
+
+DVoice offers powerful text-to-speech (TTS) capabilities, allowing you to convert text into lifelike spoken audio using two distinct endpoints. These endpoints cater to different use cases, providing flexibility for both single audio file generation and real-time streaming.
+
+## Available Endpoints
+
+DVoice supports the following TTS endpoints:
+
+- **Single Endpoint**: Converts text to audio in a single HTTP POST request, ideal for generating complete audio files. Access it at `https://oyqiz.airi.uz/api/v2/tts` (see [how to use](../../api/tts/single) in the API Reference).
+- **Streaming Endpoint**: Delivers audio in real-time via WebSocket, suited for low-latency applications. Connect at `ws://oyqiz.airi.uz/stream` (see [how to use](../../api/tts/stream) in the API Reference).
+
+## API Reference
+
+<Callout type="info">
+  For detailed instructions on using the TTS endpoints refer to the [API
+  Reference](../../api/tts/single).
+</Callout>
+
+## Required Fields
+
+Both TTS endpoints require the following fields:
+
+- **text**: A string containing the text to convert to speech.
+- **model**: A string specifying the voice model to use (e.g., "Iroda" or "Surayyo_v2").
+- **format**: A string defining the audio format, supporting the following options:
+  - `MP3`
+  - `WAV`
+  - `AAC`
+  - `OGG`
+  - `FLAC`
+
+## Optional Fields
+
+- **data**: An object for additional parameters supported by specific models (if applicable). This field is optional and depends on the chosen model.
+
+## Supported Models
+
+DVoice provides two TTS models, each tailored for the Uzbek language with specific features:
+
+- **Iroda**: A versatile model designed exclusively for Uzbek. It does not support any additional fields in the `data` object.
+- **Surayyo_v2**: An enhanced model also limited to Uzbek, featuring support for emotional voice tones. It includes an optional `emo` field in the `data` object, which can be set to:
+  - `Happy`
+  - `Strict`
+  - `Neural`
+
+## Usage Notes
+
+- The maximum text length is 5,000 characters, though this may be subject to change.
+- Supported audio formats include `MP3`, `WAV`, `OGG`, `AAC`, and `FLAC`.
+- Billing is calculated based on the length of the text processed.
+- For the Streaming Endpoint, ensure a stable WebSocket connection for uninterrupted audio delivery.
+- Refer to the [API Reference](../../api/tts/single) for detailed usage of API, error handling, and additional technical details.

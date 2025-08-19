@@ -1,0 +1,4 @@
+{
+  "title": "capabilities",
+  "pages": ["text-to-speech", "speech-to-text"]
+}

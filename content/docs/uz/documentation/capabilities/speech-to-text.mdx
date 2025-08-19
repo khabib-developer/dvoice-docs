@@ -1,0 +1,38 @@
+---
+title: Nutqni Matnga
+description: DVoice bilan nutqni matnga aylantirishni o'rnating.
+---
+
+# Nutqni Matnga
+
+DVoice nutqni matnga (STT) aylantirishning mustahkam imkoniyatlarini taqdim etadi, bu sizga nutqni aniq matn transkripsiyalariga aylantirishga yordam beradi. Ushbu funksiya bitta uchastka orqali ta'minlanadi, u qulaylik va kerak bo'lganda avtomatik til aniqlash uchun mo'ljallangan.
+
+## API Havolasi
+
+<Callout type="info">
+  STT uchastkasini ishlatish bo'yicha batafsil ko'rsatmalar, shu jumladan
+  autentifikatsiya, qo'llab-quvvatlanadigan audio formatlar va xatolarni
+  boshqarish uchun [API havolasiga](../../api/stt/single) murojaat qiling.
+</Callout>
+
+## Uchastka Umumiy Ko‘rinishi
+
+STT funksiyasi POST so‘rovi orqali `/stt` uchastkasiga kirish mumkin. Ushbu uchastka audio kirishni qayta ishlaydi va transkripsiyalangan matnni ish faoliyat ko‘rsatkichlari bilan birga qaytaradi.
+
+## Kirish Talablari
+
+- **Audio Kirishi**: Uchastka `form-data` sifatida yuborilgan audio fayllarni `audio` maydon nomi bilan qabul qiladi. Qo‘llab-quvvatlanadigan audio formatlar API havolasida batafsil ko‘rsatiladi.
+- **Ixtiyoriy Til Maydoni**: Til parametri ko‘rsatilishi mumkin; agar u bo‘sh qoldirilsa, tizim audio tilini avtomatik aniqlaydi.
+
+## Javob Tuzilishi
+
+Uchastka quyidagi maydonlarga ega JSON obyektini qaytaradi:
+
+- **transcript**: Audio’dan transkripsiyalangan matnni o‘z ichiga olgan string.
+- **inference_time**: Audio’ni qayta ishlaydigan vaqti va transkripsiya yaratish uchun ketgan vaqtni (sekundlarda) ko‘rsatuvchi son.
+
+## Foydalanish Eslatmalari
+
+- STT modeli aniq transkripsiya uchun optimallashtirilgan bo‘lib, til ko‘rsatilmagan taqdirda avtomatik aniqlash zaxira variant sifatida ishlaydi.
+- Ish faoliyati audio sifati va uzunligiga qarab o‘zgarishi mumkin.
+- **To‘lov**: Xarajatlar qayta ishlanayotgan audio davomiyligiga qarab, sekundlarda o‘lchanadi.

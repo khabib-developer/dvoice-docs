@@ -5,5 +5,8 @@ export default createI18nMiddleware(i18n);
 
 export const config = {
   // Matcher ignoring `/_next/` and `/api/`
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    // the negative lookahead below excludes paths we don't want middleware to handle
+    "/((?!api|_next/static|_next/image|favicon.ico|openapi.yaml|openapi.json|specs/).*)",
+  ],
 };

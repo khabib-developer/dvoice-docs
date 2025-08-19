@@ -1,0 +1,38 @@
+---
+title: Speech to Text
+description: Learn how to turn spoken audio into text with DVoice.
+---
+
+# Speech to Text
+
+DVoice provides robust speech-to-text (STT) capabilities, enabling you to convert spoken audio into accurate text transcriptions. This feature is powered by a single endpoint designed for ease of use and automatic language detection when needed.
+
+## API Reference
+
+<Callout type="info">
+  For detailed instructions on using the STT endpoint, including authentication,
+  supported audio formats, and error handling, refer to the [API
+  Reference](../../api/stt/single).
+</Callout>
+
+## Endpoint Overview
+
+The STT functionality is accessible via a POST request to the `/stt` endpoint. This endpoint processes audio input and returns the transcribed text along with performance metrics.
+
+## Input Requirements
+
+- **Audio Input**: The endpoint accepts audio files submitted as `form-data` with the field name `audio`. Supported audio formats will be detailed in the API Reference.
+- **Optional Language Field**: A language parameter can be specified; if left empty, the system automatically detects the language of the audio.
+
+## Response Structure
+
+The endpoint returns a JSON object with the following fields:
+
+- **transcript**: A string containing the transcribed text from the audio.
+- **inference_time**: A number representing the time taken (in seconds) to process the audio and generate the transcription.
+
+## Usage Notes
+
+- The STT model is optimized for accurate transcription, with language detection as a fallback when no language is specified.
+- Performance may vary based on audio quality and length.
+- **Billing**: Charges are calculated based on the duration of the audio processed, measured in seconds.

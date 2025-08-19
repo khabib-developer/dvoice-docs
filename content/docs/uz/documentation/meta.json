@@ -1,0 +1,21 @@
+{
+  "title": "Dokumentatsiya",
+  "root": true,
+  "icon": "Book",
+  "pages": [
+    "---Boshlash---",
+    "get-started/overview",
+    "get-started/authentication",
+    "get-started/models",
+    "---Imkoniyatlar---",
+    "capabilities/text-to-speech",
+    "capabilities/speech-to-text",
+    "---Dasturchilar uchun qo‘llanma---",
+    "developer-guide/sdk-libraries",
+    "---Resurslar---",
+    "resources/your-data",
+    "resources/rate-limits",
+    "---Boshqa---",
+    "faq"
+  ]
+}

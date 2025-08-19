@@ -1,0 +1,109 @@
+---
+title: Yagona TTS
+description: DVoice TTS API yordamida matnni nutqqa aylantirish uchun yagona HTTP so‘rovi.
+---
+
+import { Tabs, Tab } from "fumadocs-ui/components/tabs";
+
+**Yagona Uchastka** matnni yuborishga va bitta HTTP so‘rovi orqali to‘liq audio faylni olishga imkon beradi.
+
+## Uchastka
+
+`POST https://oyqiz.airi.uz/api/v2/tts`
+
+## Autentifikatsiya
+
+So‘rov sarlavhasida API tokeningizni kiritng:
+
+```
+token: <your-token>
+```
+
+## So‘rov Tanasi
+
+| Maydon | Tur    | Majburiy | Tavsif                                               |
+| ------ | ------ | -------- | ---------------------------------------------------- |
+| text   | string | ✅       | Sintetiklash uchun matn (maks. 5000 belgi).          |
+| model  | string | ✅       | Ovoz modeli (`Iroda` yoki `Surayyo_v2`).             |
+| format | string | ✅       | Chiqish formati: `MP3`, `WAV`, `AAC`, `OGG`, `FLAC`. |
+| data   | object | ❌       | Qo‘shimcha opsiyalar (faqat `Surayyo_v2` uchun).     |
+
+### Misol (JSON)
+
+```json
+{
+  "text": "Salom dunyo",
+  "model": "Iroda",
+  "format": "MP3"
+}
+```
+
+## Foydalanish Misollari
+
+<Tabs items={['curl', 'javascript', 'python']}>
+<Tab value="curl">
+
+```bash
+curl -X POST "https://oyqiz.airi.uz/api/v2/tts"   -H "Content-Type: application/json"   -H "token: YOUR_API_TOKEN"   -d '{
+    "text": "Salom dunyodan DVoice",
+    "model": "Iroda",
+    "format": "MP3"
+  }'   --output output.mp3
+```
+
+</Tab>
+<Tab value="javascript">
+
+```javascript
+import fetch from "node-fetch";
+import fs from "fs";
+
+async function tts() {
+  const response = await fetch("https://oyqiz.airi.uz/api/v2/tts", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      token: "YOUR_API_TOKEN",
+    },
+    body: JSON.stringify({
+      text: "Salom dunyodan DVoice",
+      model: "Iroda",
+      format: "MP3",
+    }),
+  });
+
+  const buffer = await response.arrayBuffer();
+  fs.writeFileSync("output.mp3", Buffer.from(buffer));
+}
+
+tts();
+```
+
+</Tab>
+<Tab value="python">
+
+```python
+import requests
+
+url = "https://oyqiz.airi.uz/api/v2/tts"
+headers = {
+    "Content-Type": "application/json",
+    "token": "YOUR_API_TOKEN"
+}
+payload = {
+    "text": "Salom dunyodan DVoice",
+    "model": "Iroda",
+    "format": "MP3"
+}
+
+response = requests.post(url, json=payload)
+with open("output.mp3", "wb") as f:
+    f.write(response.content)
+```
+
+</Tab>
+</Tabs>
+
+## Javob
+
+- So‘ralgan formatdagi binary audio fayl (masalan, `output.mp3`).

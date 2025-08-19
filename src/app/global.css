@@ -1,0 +1,26 @@
+@import "tailwindcss";
+@import "fumadocs-ui/style.css";
+@import "fumadocs-openapi/css/preset.css";
+
+.language-changer {
+}
+
+#nd-sidebar button[aria-haspopup="dialog"] {
+  padding: 4px 8px;
+  border: 1px solid rgba(158, 158, 158, 0.2) !important;
+  gap: 16px;
+}
+
+#nd-sidebar button[aria-haspopup="dialog"] svg {
+  width: 18px;
+}
+
+.sidebar-select-option div p {
+  font-size: 12px;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}

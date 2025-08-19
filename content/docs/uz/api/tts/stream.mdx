@@ -1,0 +1,183 @@
+---
+title: Stream TTS
+description: Matnni nutqqa aylantirish.
+---
+
+import { Tabs, Tab } from "fumadocs-ui/components/tabs";
+
+# Stream TTS
+
+**Stream TTS** uchastkasi audio’ni WebSocket ulanmasi orqali yaratilayotganda oqim sifatida yuborishga imkon beradi.
+
+## Uchastka
+
+`GET wss://oyqiz.airi.uz/api/v2/tts/stream`
+
+## Autentifikatsiya
+
+So‘rov sarlavhasida API tokeningizni kiritng:
+
+```
+token: <your-token>
+```
+
+## Majburiy Maydonlar
+
+- **text**: Matnni nutqqa aylantirish uchun string.
+- **model**: Ovoz modeli (masalan, `"Iroda"`, `"Surayyo_v2"`).
+- **format**: Audio formati. Quyidagilardan biri:
+  - `MP3`
+  - `WAV`
+  - `AAC`
+  - `OGG`
+  - `FLAC`
+
+## Ixtiyoriy Maydonlar
+
+- **data**: Modelga xos opsiyalar uchun ob'ekt.
+  - `Surayyo_v2` uchun `emo` maydonini quyidagi qiymatlar bilan o‘tkazing:
+    - `Happy`
+    - `Strict`
+    - `Neural`
+
+---
+
+## Foydalanish Misollari
+
+<Tabs items={['websocat', 'Node.js', 'Python']} defaultValue="websocat">
+  <Tab value="websocat">
+    ```bash
+    # Agar o'rnatilmagan bo'lsa, websocat ni o'rnating
+    # Ubuntu: sudo apt install websocat
+    # macOS: brew install websocat
+    # Windows: https://github.com/vi/websocat#install dan yuklab oling yoki Chocolatey kabi paket menejeridan foydalaning
+    # <your-token> ni haqiqiy API tokeningiz bilan almashtiring
+    # Eslatma: Dastlabki xabar yuborilmaydi; parametlar URL da
+    websocat "ws://oyqiz.airi.uz/stream?text=Haq+olinur,+berilmas&model=Iroda&format=mp3" \
+      -H "token: <your-token>" --binary > output.mp3
+    ```
+
+    **Eslatmalar**:
+    - Parametlar (`text`, `model`, `format`) URL so‘rov parametrlari sifatida uzatiladi.
+    - `text` parametridagi bo‘sh joylarni `+` yoki `%20` bilan almashtiring (masalan, "Haq olinur, berilmas" → "Assalomu+alaykum!").
+    - `--binary` flagi binary ma’lumotlarni (audio bo‘laklari) to‘g‘ri ishlatishni ta’minlaydi.
+    - Chiqish `output.mp3` ga saqlanadi. Tizimingiz MP3 o‘ynash yoki konvertatsiyasini qo‘llab-quvvatlasin.
+
+  </Tab>
+  <Tab value="Node.js">
+    ```javascript
+    const WebSocket = require('ws');
+    const fs = require('fs');
+
+    // '<your-token>' ni haqiqiy API tokeningiz bilan almashtiring
+    const params = new URLSearchParams({
+        text: 'Haq olinur, berilmas',
+        model: 'Iroda',
+        format: 'mp3'
+    });
+    const ws = new WebSocket(`ws://oyqiz.airi.uz/stream?${params.toString()}`, {
+        headers: {
+            'token': '<your-token>'
+        }
+    });
+
+    ws.on('open', () => {
+        console.log('WebSocket ulanmasi o‘rnatildi');
+        // Dastlabki xabar kerak emas; parametlar URL da
+    });
+
+    const outputStream = fs.createWriteStream('output.mp3');
+    ws.on('message', (data, isBinary) => {
+        let buffer;
+        if (isBinary) {
+            // Binary ma’lumotni boshqaring (masalan, Buffer, ArrayBuffer yoki Bufferlar massivi)
+            if (data instanceof Buffer) {
+                buffer = data;
+            } else if (data instanceof ArrayBuffer) {
+                buffer = Buffer.from(new Uint8Array(data));
+            } else if (Array.isArray(data)) {
+                buffer = Buffer.concat(data);
+            } else {
+                console.warn('Qo‘llab-quvvatlanmaydigan binary xabar formati');
+                return;
+            }
+            console.log('Audio bo‘lagi qabul qilindi:', buffer.length, 'bayt');
+            outputStream.write(buffer);
+        } else {
+            // Matnli metama’lumotlarni boshqaring
+            console.log('Metama’lumot qabul qilindi:', data.toString());
+        }
+    });
+
+    ws.on('close', () => {
+        console.log('Oqim yakunlandi');
+        outputStream.end();
+    });
+
+    ws.on('error', (error) => {
+        console.error('Xatolik:', error.message);
+        outputStream.end();
+    });
+    ```
+    **Eslatmalar**:
+    - `ws` kutubxonasini o‘rnating: `npm install ws`.
+    - Parametlar (`text`, `model`, `format`) URL so‘rov parametrlari sifatida uzatiladi.
+    - Audio bo‘laklari `output.mp3` ga saqlanadi.
+    - Tokeningizning yaroqliligiga ishonch hosil qiling, autentifikatsiya xatolaridan qochish uchun.
+
+  </Tab>
+  <Tab value="Python">
+    ```python
+    import websocket
+    import urllib.parse
+
+    # '<your-token>' ni haqiqiy API tokeningiz bilan almashtiring
+    params = {
+        "text": "Haq olinur, berilmas",
+        "model": "Iroda",
+        "format": "mp3"
+        # "indexes": true  # Ixtiyoriy: kerak bo‘lsa oching (bu API tomonidan qo‘llab-quvvatlanmaydi)
+    }
+    query_string = urllib.parse.urlencode(params)
+    ws_url = f"ws://oyqiz.airi.uz/stream?{query_string}"
+    headers = {
+        "token": "<your-token>"
+    }
+
+    def on_open(ws):
+        print("WebSocket ulanmasi o‘rnatildi")
+        # Dastlabki xabar kerak emas; parametlar URL da
+
+    def on_message(ws, message):
+        if isinstance(message, bytes):
+            print(f"Audio bo‘lagi qabul qilindi: {len(message)} bayt")
+            with open("output.mp3", "ab") as f:
+                f.write(message)
+        else:
+            print(f"Metama’lumot qabul qilindi: {message}")
+
+    def on_error(ws, error):
+        print("Xatolik:", error)
+
+    def on_close(ws, close_status_code, close_msg):
+        print("Oqim yakunlandi")
+
+    ws = websocket.WebSocketApp(
+        ws_url,
+        header=headers,
+        on_open=on_open,
+        on_message=on_message,
+        on_error=on_error,
+        on_close=on_close
+    )
+
+    ws.run_forever()
+    ```
+    **Eslatmalar**:
+    - `websocket-client` kutubxonasini o‘rnating: `pip install websocket-client`.
+    - Parametlar (`text`, `model`, `format`) URL so‘rov parametrlari sifatida uzatiladi.
+    - Audio bo‘laklari `output.mp3` ga qo‘shiladi (binary qo‘shish uchun `"ab"` rejimidan foydalaning).
+    - Tokeningizning yaroqliligiga ishonch hosil qiling, autentifikatsiya xatolaridan qochish uchun.
+
+  </Tab>
+</Tabs>

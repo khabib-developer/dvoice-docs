@@ -1,0 +1,21 @@
+{
+  "title": "Documentation",
+  "root": true,
+  "icon": "Book",
+  "pages": [
+    "---Get Started---",
+    "get-started/overview",
+    "get-started/authentication",
+    "get-started/models",
+    "---Capabilities---",
+    "capabilities/text-to-speech",
+    "capabilities/speech-to-text",
+    "---Developer Guide---",
+    "developer-guide/sdk-libraries",
+    "---Resources---",
+    "resources/your-data",
+    "resources/rate-limits",
+    "---Other---",
+    "faq"
+  ]
+}

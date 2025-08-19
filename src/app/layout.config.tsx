@@ -6,15 +6,8 @@ export function baseOptions(locale: string): BaseLayoutProps {
     i18n,
     nav: {
       title: "Dvoice",
-      url: `/${locale}`,
+      url: `/${locale}/docs/documentation/get-started/overview`,
+      transparentMode: "top",
     },
-    // githubUrl: "https://github.com",
-    // links: [
-    //   {
-    //     type: "main",
-    //     text: locale === "cn" ? "文檔" : "Documentation",
-    //     url: `/${locale}/docs`,
-    //   },
-    // ],
   };
 }

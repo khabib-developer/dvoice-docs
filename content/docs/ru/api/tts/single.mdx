@@ -1,0 +1,109 @@
+---
+title: Однократный TTS
+description: Преобразование текста в речь в одном HTTP-запросе с помощью DVoice TTS API.
+---
+
+import { Tabs, Tab } from "fumadocs-ui/components/tabs";
+
+**Однократный Эндпоинт** позволяет отправить текст и получить полный аудиофайл в одном HTTP-запросе.
+
+## Эндпоинт
+
+`POST https://oyqiz.airi.uz/api/v2/tts`
+
+## Аутентификация
+
+Включите ваш API-токен в заголовке запроса:
+
+```
+token: <your-token>
+```
+
+## Тело Запроса
+
+| Поле   | Тип    | Обязателен | Описание                                           |
+| ------ | ------ | ---------- | -------------------------------------------------- |
+| text   | string | ✅         | Текст для синтеза (макс. 5000 символов).           |
+| model  | string | ✅         | Модель голоса (`Iroda` или `Surayyo_v2`).          |
+| format | string | ✅         | Формат вывода: `MP3`, `WAV`, `AAC`, `OGG`, `FLAC`. |
+| data   | object | ❌         | Дополнительные опции (только для `Surayyo_v2`).    |
+
+### Пример (JSON)
+
+```json
+{
+  "text": "Привет мир",
+  "model": "Iroda",
+  "format": "MP3"
+}
+```
+
+## Примеры Использования
+
+<Tabs items={['curl', 'javascript', 'python']}>
+<Tab value="curl">
+
+```bash
+curl -X POST "https://oyqiz.airi.uz/api/v2/tts"   -H "Content-Type: application/json"   -H "token: YOUR_API_TOKEN"   -d '{
+    "text": "Привет мир от DVoice",
+    "model": "Iroda",
+    "format": "MP3"
+  }'   --output output.mp3
+```
+
+</Tab>
+<Tab value="javascript">
+
+```javascript
+import fetch from "node-fetch";
+import fs from "fs";
+
+async function tts() {
+  const response = await fetch("https://oyqiz.airi.uz/api/v2/tts", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      token: "YOUR_API_TOKEN",
+    },
+    body: JSON.stringify({
+      text: "Привет мир от DVoice",
+      model: "Iroda",
+      format: "MP3",
+    }),
+  });
+
+  const buffer = await response.arrayBuffer();
+  fs.writeFileSync("output.mp3", Buffer.from(buffer));
+}
+
+tts();
+```
+
+</Tab>
+<Tab value="python">
+
+```python
+import requests
+
+url = "https://oyqiz.airi.uz/api/v2/tts"
+headers = {
+    "Content-Type": "application/json",
+    "token": "YOUR_API_TOKEN"
+}
+payload = {
+    "text": "Привет мир от DVoice",
+    "model": "Iroda",
+    "format": "MP3"
+}
+
+response = requests.post(url, json=payload)
+with open("output.mp3", "wb") as f:
+    f.write(response.content)
+```
+
+</Tab>
+</Tabs>
+
+## Ответ
+
+- Бинарный аудиофайл в запрошенном формате (например, `output.mp3`).

@@ -1,0 +1,21 @@
+{
+  "title": "Документация",
+  "root": true,
+  "icon": "Book",
+  "pages": [
+    "---Начало работы---",
+    "get-started/overview",
+    "get-started/authentication",
+    "get-started/models",
+    "---Возможности---",
+    "capabilities/text-to-speech",
+    "capabilities/speech-to-text",
+    "---Руководство для разработчиков---",
+    "developer-guide/sdk-libraries",
+    "---Ресурсы---",
+    "resources/your-data",
+    "resources/rate-limits",
+    "---Другое---",
+    "faq"
+  ]
+}

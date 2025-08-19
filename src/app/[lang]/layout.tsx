@@ -1,4 +1,4 @@
-import "fumadocs-ui/style.css";
+import "../global.css";
 import { RootProvider } from "fumadocs-ui/provider";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
@@ -63,13 +63,7 @@ export default async function Layout({
   const { lang } = await params;
   return (
     <html lang={lang} className={inter.className} suppressHydrationWarning>
-      <body
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "100vh",
-        }}
-      >
+      <body>
         <RootProvider
           i18n={{
             locale: lang,

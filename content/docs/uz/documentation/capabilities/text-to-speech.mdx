@@ -1,0 +1,55 @@
+---
+title: Matnni Nutqqa
+description: DVoice bilan matnni hayotga o'xshash ovozli audioga aylantirishni o'rnating
+---
+
+DVoice matnni nutqqa (TTS) aylantirishning kuchli imkoniyatlarini taqdim etadi, bu sizga matnni hayotga o'xshash ovozli audioga aylantirishga imkon beradi, ikkita alohida uchastka orqali. Ushbu uchastkalar turli xil foydalanish holatlariga mos keladi va bitta audio faylini yaratishdan tortib real vaqtli oqim translyatsiyasigacha moslashuvchanlikni ta'minlaydi.
+
+## Mavjud Uchastkalar
+
+DVoice quyidagi TTS uchastkalarini qo'llab-quvvatlaydi:
+
+- **Yagona Uchastka**: Matnni bitta HTTP POST so'rovi orqali audioga aylantiradi, bu to'liq audio fayllarni yaratish uchun juda mos. U `https://oyqiz.airi.uz/api/v2/tts` manzilida mavjud (API havolasida [qanday ishlatishni ko'ring](../../api/tts/single)).
+- **Oqim Uchastkasi**: WebSocket orqali audio'ni real vaqt rejimida yetkazib beradi, bu past kechikishli ilovalar uchun mos. U `ws://oyqiz.airi.uz/stream` manzilida ulanish mumkin (API havolasida [qanday ishlatishni ko'ring](../../api/tts/stream)).
+
+## API Havolasi
+
+<Callout type="info">
+  TTS uchastkalarini ishlatish bo'yicha batafsil ko'rsatmalar uchun [API
+  havolasiga](../../api/stt/single) murojaat qiling.
+</Callout>
+
+## Majburiy Maydonlar
+
+Ikkala TTS uchastkasi quyidagi maydonlarni talab qiladi:
+
+- **text**: Nutqqa aylantirish uchun matnni o'z ichiga olgan string.
+- **model**: Foydalaniladigan ovoz modelini ko'rsatuvchi string (masalan, "Iroda" yoki "Surayyo_v2").
+- **format**: Audio formatini belgilovchi string, quyidagi variantlarni qo'llab-quvvatlaydi:
+  - `MP3`
+  - `WAV`
+  - `AAC`
+  - `OGG`
+  - `FLAC`
+
+## Ixtiyoriy Maydonlar
+
+- **data**: Muayyan modellarga xos qo'shimcha parametrlarni o'z ichiga oluvchi obyekt (agar kerak bo'lsa). Bu maydon ixtiyoriy bo'lib, tanlangan modelga bog'liq.
+
+## Qo'llab-quvvatlanadigan Modellar
+
+DVoice ikkita TTS modelini taqdim etadi, ularning har biri o'zbek tili uchun maxsus xususiyatlarga ega:
+
+- **Iroda**: O'zbek tili uchun maxsus ishlab chiqilgan ko'p qirrali model. `data` obyektida qo'shimcha maydonlarni qo'llab-quvvatlamaydi.
+- **Surayyo_v2**: O'zbek tili bilan cheklangan takomillashtirilgan model bo'lib, hissiy ovoz ohanglarini qo'llab-quvvatlaydi. U `data` obyektida ixtiyoriy `emo` maydonini o'z ichiga oladi, bu quyidagi qiymatlarga ega bo'lishi mumkin:
+  - `Happy` (Xursand)
+  - `Strict` (Qattiq)
+  - `Neural` (Neytral)
+
+## Foydalanish Eslatmalari
+
+- Maksimal matn uzunligi: 5,000 belgi, ammo bu o'zgarishi mumkin.
+- Qo'llab-quvvatlanadigan audio formatlar: `MP3`, `WAV`, `OGG`, `AAC` va `FLAC`.
+- To'lov matn uzunligiga qarab hisoblanadi.
+- Oqim uchastkasi uchun uzluksiz audio yetkazib berish uchun barqaror WebSocket ulanishini ta'minlang.
+- API foydalanishi, xatolarni boshqarish va qo'shimcha texnik ma'lumotlar uchun [API havolasiga](../../api/tts/single) murojaat qiling.
