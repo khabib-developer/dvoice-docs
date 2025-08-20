@@ -151,7 +151,7 @@ token: <your-token>
     def on_message(ws, message):
         if isinstance(message, bytes):
             print(f"Received audio chunk: {len(message)} bytes")
-            with open("output.mp3", "ab") as f:
+            with open("output.mp3", "wb") as f:
                 f.write(message)
         else:
             print(f"Received metadata: {message}")

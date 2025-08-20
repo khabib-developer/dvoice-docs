@@ -93,17 +93,18 @@ import requests
 
 url = "https://oyqiz.airi.uz/api/v2/stt"
 headers = {
-    "token": "YOUR_API_TOKEN"
-}
-files = {
-    "audio": open("audio.mp3", "rb")
-}
-data = {
-    "language": "uz"
+    "token": "01985ef0-6a9e-74ca-bd9d-621c82a348fb"
 }
 
-response = requests.post(url, headers=headers, files=files, data=data)
-print("Транскрипция:", response.json()["transcript"])
+with open("output.mp3", "rb") as f:
+    files = {
+        "audio": ("output.mp3", f, "audio/mpeg")
+    }
+
+    response = requests.post(url, headers=headers, files=files)
+
+print("Status:", response.status_code)
+print("Response:", response.json())
 ```
 
       </Tab>
